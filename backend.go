@@ -45,7 +45,7 @@ func (s *Story) checkStory() error {
 		if arc == nil {
 			return errors.New(name + " has an invalid value in Arcs")
 		}
-		if arc.Name == "" {
+		if name == "" || arc.Name == "" {
 			return errors.New("Arc name cannot be empty")
 		}
 		if name != arc.Name {
