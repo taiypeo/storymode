@@ -1,8 +1,9 @@
 package main
 
-import "errors"
-
-import "os"
+import (
+	"errors"
+	"os"
+)
 
 const startArcName = "~~start~~"
 const endArcName = "~~end~~"
@@ -44,11 +45,11 @@ func (s *Story) checkStory() error {
 		if arc == nil {
 			return errors.New(name + " has an invalid value in Arcs")
 		}
-		if name != arc.Name {
-			return errors.New(arc.Name + " has an invalid key in Arcs")
-		}
 		if arc.Name == "" {
 			return errors.New("Arc name cannot be empty")
+		}
+		if name != arc.Name {
+			return errors.New(arc.Name + " has an invalid key in Arcs")
 		}
 		if arc.Text == "" {
 			return errors.New(arc.Name + "'s Text cannot be empty")
@@ -64,7 +65,7 @@ func (s *Story) checkStory() error {
 			if targetArcName == "" {
 				return errors.New(arc.Name + "'s option targets cannot be empty")
 			}
-			if _, ok := s.Arcs[targetArcName]; !ok {
+			if _, ok := s.Arcs[targetArcName]; targetArcName != endArcName && !ok {
 				return errors.New(arc.Name + "'s options should point to existing arcs")
 			}
 		}
