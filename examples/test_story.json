@@ -1,0 +1,29 @@
+{
+	"Name": "Boring story",
+	"Author": "Name Surname",
+	"Arcs": [
+		{
+			"Name": "~~start~~",
+			"Text": "You embark on your journey...",
+			"Options": {
+				"Option A": "opt_a",
+				"Option B": "opt_b",
+				"End your journey!": "~~end~~"
+			}
+		},
+		{
+			"Name": "opt_a",
+			"Text": "You chose option A!",
+			"Options": {
+				"End your journey!": "~~end~~"
+			}
+		},
+		{
+			"Name": "opt_b",
+			"Text": "You chose option B!",
+			"Options": {
+				"End your journey!": "~~end~~"
+			}
+		}
+	]
+}

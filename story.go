@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -35,38 +36,38 @@ func (s *Story) checkStory() error {
 	}
 
 	if _, ok := s.Arcs[startArcName]; !ok {
-		return errors.New(startArcName + " should be present in Arcs in the Story struct")
+		return fmt.Errorf("%s should be present in Arcs in the Story struct", startArcName)
 	}
 	if _, ok := s.Arcs[endArcName]; ok {
-		return errors.New(endArcName + " should NOT be present in Arcs in the Story struct")
+		return fmt.Errorf("%s should NOT be present in Arcs in the Story struct", endArcName)
 	}
 
 	for name, arc := range s.Arcs {
 		if arc == nil {
-			return errors.New(name + " has an invalid value in Arcs")
+			return fmt.Errorf("%s has an invalid empty value in Arcs", name)
 		}
 		if name == "" || arc.Name == "" {
 			return errors.New("Arc name cannot be empty")
 		}
 		if name != arc.Name {
-			return errors.New(arc.Name + " has an invalid key in Arcs")
+			return fmt.Errorf("%s has an invalid key in Arcs (%s)", arc.Name, name)
 		}
 		if arc.Text == "" {
-			return errors.New(arc.Name + "'s Text cannot be empty")
+			return fmt.Errorf("%s's Text cannot be empty", arc.Name)
 		}
 		if arc.Options == nil {
-			return errors.New(arc.Name + "'s Options cannot be nil")
+			return fmt.Errorf("%s's Options cannot be nil", arc.Name)
 		}
 
 		for optionName, targetArcName := range arc.Options {
 			if optionName == "" {
-				return errors.New(arc.Name + "'s option names cannot be empty")
+				return fmt.Errorf("%s's option names cannot be empty", arc.Name)
 			}
 			if targetArcName == "" {
-				return errors.New(arc.Name + "'s option targets cannot be empty")
+				return fmt.Errorf("%s's option targets cannot be empty", arc.Name)
 			}
 			if _, ok := s.Arcs[targetArcName]; targetArcName != endArcName && !ok {
-				return errors.New(arc.Name + "'s options should point to existing arcs")
+				return fmt.Errorf("%s's options should point to existing arcs", arc.Name)
 			}
 		}
 	}
@@ -82,21 +83,9 @@ func (s *Story) changeArc(arcName string) error {
 
 	arc, ok := s.Arcs[arcName]
 	if !ok {
-		return errors.New("Cannot change to arc " + arcName + " -- no such arc")
+		return fmt.Errorf("Cannot change to arc %s -- no such arc", arcName)
 	}
 
 	s.CurrentArc = arc
 	return nil
-}
-
-func loadStory(folderPath string) (*Story, error) {
-	story := &Story{Arcs: make(map[string]*Arc)}
-
-	// TODO: actually load the story from JSON
-
-	if err := story.checkStory(); err != nil {
-		return nil, err
-	}
-
-	return story, nil
 }
