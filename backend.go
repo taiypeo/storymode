@@ -2,6 +2,8 @@ package main
 
 import "errors"
 
+import "os"
+
 const startArcName = "~~start~~"
 const endArcName = "~~end~~"
 
@@ -18,12 +20,65 @@ type Story struct {
 }
 
 func (s *Story) checkStory() error {
-	// TODO: check the story for validity
+	if s.Name == "" {
+		return errors.New("Story's name cannot be empty")
+	}
+	if s.Author == "" {
+		return errors.New("Story's author cannot be empty")
+	}
+	if s.Arcs == nil {
+		return errors.New("Arcs cannot be nil in the Story struct")
+	}
+	if s.CurrentArc == nil {
+		return errors.New("CurrentArc cannot be nil in the Story struct")
+	}
+
+	if _, ok := s.Arcs[startArcName]; !ok {
+		return errors.New(startArcName + " should be present in Arcs in the Story struct")
+	}
+	if _, ok := s.Arcs[endArcName]; ok {
+		return errors.New(endArcName + " should NOT be present in Arcs in the Story struct")
+	}
+
+	for name, arc := range s.Arcs {
+		if arc == nil {
+			return errors.New(name + " has an invalid value in Arcs")
+		}
+		if name != arc.Name {
+			return errors.New(arc.Name + " has an invalid key in Arcs")
+		}
+		if arc.Name == "" {
+			return errors.New("Arc name cannot be empty")
+		}
+		if arc.Text == "" {
+			return errors.New(arc.Name + "'s Text cannot be empty")
+		}
+		if arc.Options == nil {
+			return errors.New(arc.Name + "'s Options cannot be nil")
+		}
+
+		for optionName, targetArcName := range arc.Options {
+			if optionName == "" {
+				return errors.New(arc.Name + "'s option names cannot be empty")
+			}
+			if targetArcName == "" {
+				return errors.New(arc.Name + "'s option targets cannot be empty")
+			}
+			if _, ok := s.Arcs[targetArcName]; !ok {
+				return errors.New(arc.Name + "'s options should point to existing arcs")
+			}
+		}
+	}
 
 	return nil
 }
 
 func (s *Story) changeArc(arcName string) error {
+	if arcName == endArcName {
+		// TODO: add resource deallocation
+		os.Exit(0)
+	}
+
 	arc, ok := s.Arcs[arcName]
 	if !ok {
 		return errors.New("Cannot change to arc " + arcName + " -- no such arc")
