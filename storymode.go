@@ -44,6 +44,20 @@ func main() {
 					if selectedOption < 0 {
 						selectedOption = 0
 					}
+				case tcell.KeyEnter:
+					selectedOptionText := story.CurrentArc.OptionNames[selectedOption]
+					targetArc := story.CurrentArc.Options[selectedOptionText]
+					finished, err := story.changeArc(targetArc)
+					selectedOption = 0
+					if finished || err != nil {
+						if err != nil {
+							(*screen).Fini()
+							fmt.Fprintf(os.Stderr, "Gameplay error: %s\n", err)
+						}
+
+						close(endChan)
+						return
+					}
 				}
 			case *tcell.EventResize:
 				w, _ := (*screen).Size()
