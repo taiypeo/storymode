@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	story, err := loadStory("examples/test_story.json")
+	story, err := loadStory("../examples/test_story.json")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Loading error: %s\n", err)
 		os.Exit(1)
@@ -49,12 +49,11 @@ func main() {
 					targetArc := story.CurrentArc.Options[selectedOptionText]
 					finished, err := story.changeArc(targetArc)
 					selectedOption = 0
-					if finished || err != nil {
-						if err != nil {
-							(*screen).Fini()
-							fmt.Fprintf(os.Stderr, "Gameplay error: %s\n", err)
-						}
-
+					if err != nil {
+						(*screen).Fini()
+						fmt.Fprintf(os.Stderr, "Gameplay error: %s\n", err)
+						os.Exit(1)
+					} else if finished {
 						close(endChan)
 						return
 					}
