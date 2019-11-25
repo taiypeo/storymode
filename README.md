@@ -12,3 +12,11 @@ go build -o storymode *
 ```
 ./storymode path_to_story.json
 ```
+## Controls
+`Esc` -- quit the game.
+
+`Up Arrow` -- move one option up.
+
+`Down Arrow` -- move one option down.
+
+`Enter` -- choose the selected option.
