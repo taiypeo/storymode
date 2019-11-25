@@ -24,6 +24,7 @@ func main() {
 	story.CurrentArc.recalculateTextWrap(w)
 
 	endChan := make(chan struct{})
+	selectedOption := 0
 	go func() {
 		for {
 			ev := (*screen).PollEvent()
@@ -33,13 +34,23 @@ func main() {
 				case tcell.KeyEscape:
 					close(endChan)
 					return
+				case tcell.KeyDown:
+					selectedOption++
+					if selectedOption > len(story.CurrentArc.OptionNames)-1 {
+						selectedOption = len(story.CurrentArc.OptionNames) - 1
+					}
+				case tcell.KeyUp:
+					selectedOption--
+					if selectedOption < 0 {
+						selectedOption = 0
+					}
 				}
 			case *tcell.EventResize:
 				w, _ := (*screen).Size()
 				story.CurrentArc.recalculateTextWrap(w)
 			}
 
-			redrawUI(screen, story, 0)
+			redrawUI(screen, story, selectedOption)
 		}
 	}()
 
