@@ -7,8 +7,19 @@ import (
 	"github.com/gdamore/tcell"
 )
 
+const usage = `storymode - A CLI game engine for text-based "Choose Your Own Adventure" type games
+
+Usage: ./storymode path_to_story.json
+`
+
 func main() {
-	story, err := loadStory("../examples/test_story.json")
+	args := os.Args[1:]
+	if len(args) != 1 {
+		fmt.Fprint(os.Stderr, usage)
+		os.Exit(0)
+	}
+
+	story, err := loadStory(args[0])
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Loading error: %s\n", err)
 		os.Exit(1)

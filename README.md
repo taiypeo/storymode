@@ -10,5 +10,5 @@ go build -o storymode *
 
 ## Running
 ```
-./storymode STORY_PATH
+./storymode ./storymode path_to_story.json
 ```
