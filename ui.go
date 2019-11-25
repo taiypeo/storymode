@@ -61,6 +61,9 @@ func redrawUI(screen *tcell.Screen, story *Story, selectedOptionIndex int) {
 	currentPage := selectedOptionIndex / optionsCount
 	pageFirstItem := optionsCount * currentPage
 	maxItem := len(currentArc.Options) - 1
+	if pageFirstItem+optionsCount-1 < maxItem {
+		maxItem = pageFirstItem + optionsCount - 1
+	}
 
 	(*screen).Clear()
 

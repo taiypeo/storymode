@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"sort"
 )
 
 type StoryLoader struct {
@@ -54,6 +55,8 @@ func loadStory(filepath string) (*Story, error) {
 		for optionName := range arc.Options {
 			arc.OptionNames = append(arc.OptionNames, optionName)
 		}
+
+		sort.Strings(arc.OptionNames)
 
 		story.Arcs[arc.Name] = arc
 	}

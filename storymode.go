@@ -19,7 +19,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	redrawUI(screen, story, 1)
+	redrawUI(screen, story, 0)
 	time.Sleep(time.Second * 5)
 	(*screen).Fini()
 }
