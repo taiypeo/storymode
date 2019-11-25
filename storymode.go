@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
+
+	"github.com/gdamore/tcell"
 )
 
 func main() {
@@ -19,7 +20,29 @@ func main() {
 		os.Exit(1)
 	}
 
-	redrawUI(screen, story, 0)
-	time.Sleep(time.Second * 5)
+	w, _ := (*screen).Size()
+	story.CurrentArc.recalculateTextWrap(w)
+
+	endChan := make(chan struct{})
+	go func() {
+		for {
+			ev := (*screen).PollEvent()
+			switch ev := ev.(type) {
+			case *tcell.EventKey:
+				switch ev.Key() {
+				case tcell.KeyEscape:
+					close(endChan)
+					return
+				}
+			case *tcell.EventResize:
+				w, _ := (*screen).Size()
+				story.CurrentArc.recalculateTextWrap(w)
+			}
+
+			redrawUI(screen, story, 0)
+		}
+	}()
+
+	<-endChan
 	(*screen).Fini()
 }

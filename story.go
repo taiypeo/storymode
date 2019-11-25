@@ -61,6 +61,7 @@ func (a *Arc) recalculateTextWrap(width int) {
 		}
 	}
 
+	a.TextWrap = make([]string, 0)
 	j := len(a.TextSplit)
 	for j > 0 {
 		i := breaks[j]
