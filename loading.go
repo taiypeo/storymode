@@ -48,6 +48,9 @@ func loadStory(filepath string) (*Story, error) {
 	story.Author = sl.Author
 	for i := 0; i < len(sl.Arcs); i++ {
 		arc := &sl.Arcs[i]
+		arc.calculateTextSplit()
+		arc.recalculateTextWrap(80)
+
 		story.Arcs[arc.Name] = arc
 	}
 	startArc, ok := story.Arcs[startArcName]

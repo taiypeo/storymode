@@ -4,15 +4,74 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
 )
 
 const startArcName = "~~start~~"
 const endArcName = "~~end~~"
 
 type Arc struct {
-	Name, Text string
-	Options    map[string]string // option name -> arc name
+	Name, Text          string
+	TextSplit, TextWrap []string
+	Options             map[string]string // option name -> arc name
 	// Sound, Music (*sound struct)
+}
+
+func (a *Arc) calculateTextSplit() {
+	a.TextSplit = strings.Split(a.Text, " ")
+}
+
+// Solves the word wrap problem for the text (https://xxyxyz.org/line-breaking/)
+func (a *Arc) recalculateTextWrap(width int) {
+	const MaxInt = int(^uint(0) >> 1) // all 1 except for the first bit
+
+	offsets := make([]int, len(a.TextSplit)+1)
+	offsets[0] = 0
+	for i, word := range a.TextSplit {
+		offsets[i+1] = offsets[i] + len(word)
+	}
+
+	minima := make([]int, len(a.TextSplit)+1)
+	minima[0] = 0
+	for i := 1; i < len(minima); i++ {
+		minima[i] = MaxInt
+	}
+
+	breaks := make([]int, len(a.TextSplit)+1)
+	for i := 1; i < len(breaks); i++ {
+		breaks[i] = 0
+	}
+
+	for i := 0; i < len(a.TextSplit); i++ {
+		j := i + 1
+		for j <= len(a.TextSplit) {
+			w := offsets[j] - offsets[i] + j - i - 1
+			if w > width {
+				break
+			}
+
+			cost := minima[i] + (width-w)*(width-w)
+			if cost < minima[j] {
+				minima[j] = cost
+				breaks[j] = i
+			}
+
+			j++
+		}
+	}
+
+	j := len(a.TextSplit)
+	for j > 0 {
+		i := breaks[j]
+		a.TextWrap = append(a.TextWrap, strings.Join(a.TextSplit[i:j], " "))
+		j = i
+	}
+
+	// Reverse a.TextWrap
+	for i := len(a.TextWrap)/2 - 1; i >= 0; i-- {
+		opposite := len(a.TextWrap) - 1 - i
+		a.TextWrap[i], a.TextWrap[opposite] = a.TextWrap[opposite], a.TextWrap[i]
+	}
 }
 
 type Story struct {
@@ -57,6 +116,12 @@ func (s *Story) checkStory() error {
 		}
 		if arc.Options == nil {
 			return fmt.Errorf("%s's Options cannot be nil", arc.Name)
+		}
+		if arc.TextSplit == nil {
+			return fmt.Errorf("%s's TextSplit cannot be nil", arc.Name)
+		}
+		if arc.TextWrap == nil {
+			return fmt.Errorf("%s's TextWrap cannot be nil", arc.Name)
 		}
 
 		for optionName, targetArcName := range arc.Options {
