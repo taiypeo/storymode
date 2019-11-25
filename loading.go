@@ -51,6 +51,10 @@ func loadStory(filepath string) (*Story, error) {
 		arc.calculateTextSplit()
 		arc.recalculateTextWrap(80)
 
+		for optionName := range arc.Options {
+			arc.OptionNames = append(arc.OptionNames, optionName)
+		}
+
 		story.Arcs[arc.Name] = arc
 	}
 	startArc, ok := story.Arcs[startArcName]

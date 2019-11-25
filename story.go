@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"os"
+	"github.com/mattn/go-runewidth"
 	"strings"
 )
 
@@ -14,6 +14,7 @@ type Arc struct {
 	Name, Text          string
 	TextSplit, TextWrap []string
 	Options             map[string]string // option name -> arc name
+	OptionNames         []string
 	// Sound, Music (*sound struct)
 }
 
@@ -28,7 +29,7 @@ func (a *Arc) recalculateTextWrap(width int) {
 	offsets := make([]int, len(a.TextSplit)+1)
 	offsets[0] = 0
 	for i, word := range a.TextSplit {
-		offsets[i+1] = offsets[i] + len(word)
+		offsets[i+1] = offsets[i] + runewidth.StringWidth(word)
 	}
 
 	minima := make([]int, len(a.TextSplit)+1)
@@ -117,6 +118,9 @@ func (s *Story) checkStory() error {
 		if arc.Options == nil {
 			return fmt.Errorf("%s's Options cannot be nil", arc.Name)
 		}
+		if arc.OptionNames == nil {
+			return fmt.Errorf("%s's OptionNames cannot be nil", arc.Name)
+		}
 		if arc.TextSplit == nil {
 			return fmt.Errorf("%s's TextSplit cannot be nil", arc.Name)
 		}
@@ -140,17 +144,16 @@ func (s *Story) checkStory() error {
 	return nil
 }
 
-func (s *Story) changeArc(arcName string) error {
+func (s *Story) changeArc(arcName string) (bool, error) {
 	if arcName == endArcName {
-		// TODO: add resource deallocation
-		os.Exit(0)
+		return true, nil
 	}
 
 	arc, ok := s.Arcs[arcName]
 	if !ok {
-		return fmt.Errorf("Cannot change to arc %s -- no such arc", arcName)
+		return false, fmt.Errorf("Cannot change to arc %s -- no such arc", arcName)
 	}
 
 	s.CurrentArc = arc
-	return nil
+	return false, nil
 }
